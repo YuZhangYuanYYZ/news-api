@@ -12,5 +12,8 @@
   "devDependencies": {
     "mongoose": "^5.5.4",
     "nodemon": "^1.18.11"
+  },
+  "dependencies": {
+    "mongodb": "^3.2.3"
   }
 }
