@@ -15,7 +15,13 @@ https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/
 
     brew services start mongodb-community@4.0
 
+then
+
+    $ mongo
+
 ### select database to use
+
+quick reference https://docs.mongodb.com/manual/reference/mongo-shell/
 
     > use myNewDB
     switched to db myNewDB
