@@ -1,7 +1,7 @@
 var router = require('express').Router();
-var postController = require('../controllers/postController');
+const postController = require('../controllers/postController');
 
-router.get("/", postController.get);
+router.get("/", postController.getAll);
 router.get("/:postId", postController.getOne);
 
 module.exports = router;
