@@ -37,6 +37,7 @@ quick reference https://docs.mongodb.com/manual/reference/mongo-shell/
     { item: "mousepad", qty: 25, tags: ["gel", "blue"], size: { h: 19, w: 22.85, uom: "cm" } }
     })
 
+
 ## Find document
 
     db.collection.find( { item: "canvas" } )
@@ -94,3 +95,7 @@ db.inventory.replaceOne(
 
 http://mongodb.github.io/node-mongodb-native/3.2/reference/ecmascriptnext/crud/
 https://www.w3schools.com/nodejs/nodejs_mongodb_createcollection.asp
+
+
+
+db.quotes.update({"id" : 3}, {$set:{author: "Mike Woods" }});

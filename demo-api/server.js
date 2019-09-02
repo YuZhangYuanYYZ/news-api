@@ -1,7 +1,9 @@
 const express = require('express')
 const app = express()
 const MongoClient = require('mongodb').MongoClient
-
+var bodyParser = require('body-parser');
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 let db;
 const url = 'mongodb://localhost:27017/';
@@ -14,48 +16,66 @@ mongoClient.connect().then((client) => {
     })
 })
 
-app.get('/quotes', (req, res) => {
-    db.collection('quotes').find().toArray((err, result) => {
+app.get('/quotes/:id', (req, res) => {
+    const params = req.params;
+    db.collection('quotes').find({ 'id': Number(params.id) }).toArray((err, result) => {
         if (err) return console.log(err)
-        res.json({
-            quotes: result
-        })
+
+        res.json(
+            result.filter(element => element.id == params.id)
+        )
+    })
+})
+
+app.get('/quotes', (req, res) => {
+    db.collection('quotes').find({}).toArray((err, result) => {
+        if (err) return console.log(err)
+        res.json(
+            result
+        )
+        res.json();
     })
 })
 
 app.post('/quotes', (req, res) => {
-    db.collection('quotes').save(req.body, (err, result) => {
-        if (err) return console.log(err)
-        console.log('saved to database')
-        res.json(result)
+    const body = req.body;
+    db.collection('quotes').insertOne(body, (err, result) => {
+        if (result) { res.json(body) }
     })
 })
 
 app.put('/quotes/:id', (req, res) => {
-    db.collection('quotes')
-        .findOneAndUpdate({
-            name: 'Yoda'
-        }, {
-            $set: {
-                name: req.body.name,
-                quote: req.body.quote
-            }
-        }, {
-            sort: {
-                _id: -1
-            },
-            upsert: true
+    const params = req.params;
+    const body = req.body;
+    const numberId = Number(params.id);
+
+    db.collection('quotes').updateOne({ 'id': numberId }, { $set: body }, function (err, result) {
+
+        console.log(result.matchedCount);
+
+        db.collection('quotes').find({ 'id': numberId }).toArray((err, findResult) => {
+            if (err) return console.log(err)
+            const resultAfterPut = findResult.map(element => {
+                return {
+                    ...element,
+                    author: body.author.toString()
+                }
+            });
+            res.json(resultAfterPut);
+        })
+    })
+})
+
+
+app.delete('/quotes/:id', (req, res) => {
+    const params = req.params;
+    const numberId = Number(params.id);
+
+    db.collection('quotes').deleteOne(
+        {
+            'id': numberId
         }, (err, result) => {
-            if (err) return res.send(err)
-            res.json(result)
+            if (result) { res.json(); }
         })
 })
 
-app.delete('/quotes/:id', (req, res) => {
-    db.collection('quotes').findOneAndDelete({
-        name: req.body.name
-    }, (err, result) => {
-        if (err) return res.send(500, err)
-        res.json('A darth vadar quote got deleted')
-    })
-})
