@@ -1,16 +1,20 @@
 const express = require('express')
 const app = express()
 const MongoClient = require('mongodb').MongoClient
+const bodyParser = require('body-parser');
+//对body-parser进行配置
+app.use( bodyParser.urlencoded({extended: true}) )
+app.use(bodyParser.json());
 
 
 let db;
 const url = 'mongodb://localhost:27017/';
-const mongoClient = new MongoClient(url);
+const mongoClient = new MongoClient(url,{ useNewUrlParser: true });
 mongoClient.connect().then((client) => {
     const DB_NAME = 'quotes';
     db = client.db(DB_NAME);
-    app.listen(process.env.PORT || 3000, () => {
-        console.log('listening on 3000')
+    app.listen(process.env.PORT || 3004, () => {
+        console.log('listening on 3004')
     })
 })
 
