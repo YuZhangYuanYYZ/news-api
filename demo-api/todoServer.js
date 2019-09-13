@@ -1,34 +1,41 @@
 const express = require('express');
 const cors = require('cors');
 const ObjectId = require('mongodb').ObjectId;
-
-const MongoClient = require('mongodb').MongoClient;
+const mongoose = require('mongoose')
+//const MongoClient = require('mongodb').MongoClient;
 const app = express();
 const bodyParser = require('body-parser');
 //对body-parser进行配置
 app.use( bodyParser.urlencoded({extended: true}) )
 app.use(bodyParser.json());
 app.use(cors({ origin: 'http://localhost:3000' , credentials : true}));
-const url ='mongodb://localhost:27017/'
+const url ='mongodb://localhost:27017/mydb'
 const dbName = 'mydb';
-let db ;
+let Schema       = mongoose.Schema;
 
-const client = new MongoClient(url,{ useNewUrlParser: true });
+var TodoSchema   = new Schema({
+    text: String,
+    completed:Boolean
+});
 
+Todo = mongoose.model('Todo', TodoSchema);
+// const client =  mongoose(url,{ useNewUrlParser: true });
+mongoose.connect(url,{ useNewUrlParser: true });
+let dbconnect= mongoose.connection;
+dbconnect.on('error', console.error.bind(console, 'connection error:'));
+
+dbconnect.once('open', function() {
+  console.log("DB connection alive");
+});
 // Use connect method to connect to the Server
-client.connect(function(err) {
-  console.log("Connected successfully to server");
-
-  db = client.db(dbName);
   app.listen(process.env.PORT || 3004, () => {
     console.log('listening on 3004')
   })
 
-});
 
 
 app.get("/todos", (req, res) => {
-    db.collection('todos').find().toArray((err,result)=>{
+    Todo.find((err,result)=>{
         if(err){
             console.log(err,"can't get todos")
         }
@@ -43,8 +50,8 @@ app.get("/todos", (req, res) => {
 
 app.get('/todos/:id',(req,res)=>{
     console.log(req.params,"result")
-    // db.collection('todos').find({"_id":req.params.id}).toArray((err,result)=>{
-    db.collection('todos').find({"_id": ObjectId(req.params.id)}).toArray((err,result)=>{
+    // db.collection('todos').find({"_id":req.params._id}).toArray((err,result)=>{
+        Todo.findById.findById({_id:req.params._id},(err,result)=>{
         if(err){
             console.log(err,"can't get todos");
         }
@@ -56,21 +63,24 @@ app.get('/todos/:id',(req,res)=>{
 })
 
 app.post('/todos/',(req,res)=>{
-    db.collection('todos').insertOne(req.body,(err,result)=>{
+    let todo = new Todo(req.body)
+    console.log(req.body,"req.body")
+    todo.save((err)=>{
         if(err){
             console.log(err,"can't post req.body");
         }
         else{
-            res.json(result)
+            res.json(todo)
         }
     })
 })
 
 
 app.delete('/todos/:id',(req,res)=>{
-    db.collection('todos').findOneAndDelete({"_id": ObjectId(req.params.id)},(err,result)=>{
+    console.log(req.params._id,"enter delete")
+    Todo.remove({_id:req.params._id},(err,result)=>{
         if(err){
-            console.log(err,"can't post req.body");
+            console.log(err,ObjectId(req.params._id),"can't post req.body");
         }
         else{
             res.json('A darth vadar quote got deleted')
@@ -79,15 +89,22 @@ app.delete('/todos/:id',(req,res)=>{
 })
 
 app.put('/todos/:id',(req,res)=>{
-    db.collection('todos').findOneAndUpdate({"_id":ObjectId(req.params.id)},{$set:{completed:!req.completed}},{
-        sort: {
-            _id: -1
-        },
-        upsert: true
-    }, (err, result) => {
-        if (err) return res.send(err)
-        res.json(result)
+    Todo.findById(ObjectId(req.params._id),(err,res)=>{
+        //let newres = res;
+       console.log(res,req.params._id,"res.completed")
+        let todo = new Todo(res);
+        todo.save((err)=>{
+             if (err) return newres.send(err);
+            //  else{
+            //     res.json(todo)
+            //  }
+            });
     })
 })
 
 // curl -X PUT -H "Content-Type: application/json" -d '{"completed":false}' "http://127.0.0.1:3004/todos/5d72598c1ab2884aee121fa3"
+//curl http://localhost:3004/todos
+
+//   curl -X DELETE "http://localhost:3004/todos/5d7259503fdf3f4ad2c3e196"
+
+// curl -X POST -H "Content-Type: application/json" -d '{"text": "hello 33333", "completed":false}' "http://127.0.0.1:3004/todos"

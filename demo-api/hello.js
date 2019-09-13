@@ -29,11 +29,7 @@ app.get('/users/:id',(req,res)=>{
     res.status(200).send(body)
 });
 app.put('/users/:id',(req,res)=>{
-    console.log("enter")
-    const user={
-        author:"yyz",
-        age:19
-    }
+
     const params = req.params;
     const numberId = Number(params.id);
     const body = req.body;
