@@ -51,7 +51,7 @@ app.get("/todos", (req, res) => {
 app.get('/todos/:id',(req,res)=>{
     console.log(req.params,"result")
     // db.collection('todos').find({"_id":req.params._id}).toArray((err,result)=>{
-        Todo.findById.findById({_id:req.params._id},(err,result)=>{
+        Todo.findById.findById({_id:req.params.id},(err,result)=>{
         if(err){
             console.log(err,"can't get todos");
         }
@@ -77,34 +77,38 @@ app.post('/todos/',(req,res)=>{
 
 
 app.delete('/todos/:id',(req,res)=>{
-    console.log(req.params._id,"enter delete")
-    Todo.remove({_id:req.params._id},(err,result)=>{
+    
+    Todo.deleteOne({_id:req.params.id},(err,result)=>{
         if(err){
             console.log(err,ObjectId(req.params._id),"can't post req.body");
         }
         else{
-            res.json('A darth vadar quote got deleted')
+            console.log(result);
+            res.json(result)
+        
         }
     })
 })
 
 app.put('/todos/:id',(req,res)=>{
-    Todo.findById(ObjectId(req.params._id),(err,res)=>{
-        //let newres = res;
-       console.log(res,req.params._id,"res.completed")
-        let todo = new Todo(res);
+    console.log(req.params.id,"enter put")
+    Todo.findById({_id:req.params.id},(err,result)=>{
+        console.log(result,"result is put")
+        let newResult = result;
+        newResult.completed=!result.completed;
+        let todo = new Todo(newResult);
         todo.save((err)=>{
-             if (err) return newres.send(err);
-            //  else{
-            //     res.json(todo)
-            //  }
+             if (err)  res.send(err);
+             
+                res.json({ message: 'completed updated!' })
+             
             });
     })
 })
 
-// curl -X PUT -H "Content-Type: application/json" -d '{"completed":false}' "http://127.0.0.1:3004/todos/5d72598c1ab2884aee121fa3"
+// curl -X PUT -H "Content-Type: application/json" -d '{"completed":true}' "http://127.0.0.1:3004/todos/5d7c862b3ce7a42b36c7baa9"
 //curl http://localhost:3004/todos
 
-//   curl -X DELETE "http://localhost:3004/todos/5d7259503fdf3f4ad2c3e196"
+//   curl -X DELETE "http://localhost:3004/todos/5d7bc3568873402670c5a960"
 
 // curl -X POST -H "Content-Type: application/json" -d '{"text": "hello 33333", "completed":false}' "http://127.0.0.1:3004/todos"
