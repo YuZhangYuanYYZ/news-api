@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const ObjectId = require('mongodb').ObjectId;
-const mongoose = require('mongoose')
+const mongoose   = require('mongoose');
 //const MongoClient = require('mongodb').MongoClient;
 const app = express();
 const bodyParser = require('body-parser');
@@ -10,16 +10,8 @@ app.use( bodyParser.urlencoded({extended: true}) )
 app.use(bodyParser.json());
 app.use(cors({ origin: 'http://localhost:3000' , credentials : true}));
 const url ='mongodb://localhost:27017/mydb'
-const dbName = 'mydb';
-let Schema       = mongoose.Schema;
+let Todo = require("../models/TodoModel");
 
-var TodoSchema   = new Schema({
-    text: String,
-    completed:Boolean
-});
-
-Todo = mongoose.model('Todo', TodoSchema);
-// const client =  mongoose(url,{ useNewUrlParser: true });
 mongoose.connect(url,{ useNewUrlParser: true });
 let dbconnect= mongoose.connection;
 dbconnect.on('error', console.error.bind(console, 'connection error:'));
@@ -32,37 +24,38 @@ dbconnect.once('open', function() {
     console.log('listening on 3004')
   })
 
+var router = express.Router();
 
-
-app.get("/todos", (req, res) => {
-    Todo.find((err,result)=>{
-        if(err){
-            console.log(err,"can't get todos")
-        }
-        else{
-            console.log(result,"result")
-            res.json(result);
-        }
-    })
-  
+// middleware to use for all requests
+router.use(function(req, res, next) {
+	// do logging
+	console.log('router is successful',Date.now());
+	next();
 });
+// router.get(`/`, (req, res, next) => {
+//     res.json({
+//       status: 200,
+//       data: `请求成功`
+//     })
+//   })
 
-
-app.get('/todos/:id',(req,res)=>{
-    console.log(req.params,"result")
-    // db.collection('todos').find({"_id":req.params._id}).toArray((err,result)=>{
-        Todo.findById.findById({_id:req.params.id},(err,result)=>{
-        if(err){
-            console.log(err,"can't get todos");
-        }
-        else{
-            console.log(result,"result")
-            res.json(result[0]);
-    }
+app.use('/todos', router);
+//  router.route('/todos/')
+router.get(`/`,function(req, res){
+   Todo.find((err,result)=>{
+       if(err){
+           console.log(err,"can't get from api")
+       }
+       else{
+           res.json(result)
+       }
+   }) 
 })
-})
+  
 
-app.post('/todos/',(req,res)=>{
+
+
+router.post('/',(req,res)=>{
     let todo = new Todo(req.body)
     console.log(req.body,"req.body")
     todo.save((err)=>{
@@ -75,8 +68,8 @@ app.post('/todos/',(req,res)=>{
     })
 })
 
-
-app.delete('/todos/:id',(req,res)=>{
+// router.route('/todos/:id')
+router.delete('/:id',(req,res)=>{
     
     Todo.deleteOne({_id:req.params.id},(err,result)=>{
         if(err){
@@ -90,17 +83,22 @@ app.delete('/todos/:id',(req,res)=>{
     })
 })
 
-app.put('/todos/:id',(req,res)=>{
-    console.log(req.params.id,"enter put")
+router.put('/:id',(req,res)=>{
+   // console.log(req,"put request put")
     Todo.findById({_id:req.params.id},(err,result)=>{
-        console.log(result,"result is put")
+       // console.log(result,"result is put")
         let newResult = result;
         newResult.completed=!result.completed;
         let todo = new Todo(newResult);
         todo.save((err)=>{
-             if (err)  res.send(err);
+             if (err) {
+                res.send(err);
+             } 
              
-                res.json({ message: 'completed updated!' })
+            else{
+                console.log(newResult,"has been updated!")
+                res.json(newResult)
+            }  
              
             });
     })
