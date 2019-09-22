@@ -15,7 +15,6 @@ let Todo = require("../models/TodoModel");
 mongoose.connect(url,{ useNewUrlParser: true });
 let dbconnect= mongoose.connection;
 dbconnect.on('error', console.error.bind(console, 'connection error:'));
-
 dbconnect.once('open', function() {
   console.log("DB connection alive");
 });
@@ -32,15 +31,9 @@ router.use(function(req, res, next) {
 	console.log('router is successful',Date.now());
 	next();
 });
-// router.get(`/`, (req, res, next) => {
-//     res.json({
-//       status: 200,
-//       data: `请求成功`
-//     })
-//   })
+
 
 app.use('/todos', router);
-//  router.route('/todos/')
 router.get(`/`,function(req, res){
    Todo.find((err,result)=>{
        if(err){
@@ -84,9 +77,7 @@ router.delete('/:id',(req,res)=>{
 })
 
 router.put('/:id',(req,res)=>{
-   // console.log(req,"put request put")
     Todo.findById({_id:req.params.id},(err,result)=>{
-       // console.log(result,"result is put")
         let newResult = result;
         newResult.completed=!result.completed;
         let todo = new Todo(newResult);
