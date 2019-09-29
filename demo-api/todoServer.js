@@ -35,6 +35,8 @@ router.use(function(req, res, next) {
 
 app.use('/todos', router);
 router.get(`/`,function(req, res){
+    console.log("can't get from 000")
+
    Todo.find((err,result)=>{
        if(err){
            console.log(err,"can't get from api")
@@ -78,8 +80,17 @@ router.delete('/:id',(req,res)=>{
 
 router.put('/:id',(req,res)=>{
     Todo.findById({_id:req.params.id},(err,result)=>{
-        let newResult = result;
-        newResult.completed=!result.completed;
+         let newResult = result;
+         if(req.body.date){
+            console.log("herer")
+           newResult.date=req.body.date;
+             console.log(newResult,"newResult")
+
+        }
+        else{
+            newResult.completed=!result.completed;
+        }
+       
         let todo = new Todo(newResult);
         todo.save((err)=>{
              if (err) {
