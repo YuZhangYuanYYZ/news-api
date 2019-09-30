@@ -3,6 +3,6 @@ let Schema       = mongoose.Schema;
 let TodoSchema   = new Schema({
     text: String,
     completed:Boolean,
-    date:String
+    dueTime:Date
 });
 module.exports = mongoose.model('Todo', TodoSchema);

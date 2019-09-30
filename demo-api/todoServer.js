@@ -52,7 +52,7 @@ router.get(`/`,function(req, res){
 
 router.post('/',(req,res)=>{
     let todo = new Todo(req.body)
-    console.log(req.body,"req.body")
+    console.log(req,"req.body")
     todo.save((err)=>{
         if(err){
             console.log(err,"can't post req.body");
@@ -81,16 +81,13 @@ router.delete('/:id',(req,res)=>{
 router.put('/:id',(req,res)=>{
     Todo.findById({_id:req.params.id},(err,result)=>{
          let newResult = result;
-         if(req.body.date){
-            console.log("herer")
-           newResult.date=req.body.date;
-             console.log(newResult,"newResult")
+         newResult.dueTime=new Date(req.body.dueTime),
+         newResult.completed=req.body.completed,
+         newResult.id = req.body._id;
+         newResult.text = req.body.text;
+  console.log(req.body,"req.body")
+  console.log(newResult,"new result!")
 
-        }
-        else{
-            newResult.completed=!result.completed;
-        }
-       
         let todo = new Todo(newResult);
         todo.save((err)=>{
              if (err) {
