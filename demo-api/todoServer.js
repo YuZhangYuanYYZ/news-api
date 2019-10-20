@@ -45,15 +45,21 @@ router.get(`/`, function(req, res) {
 });
 
 router.post("/", (req, res) => {
-  let todo = new Todo(req.body);
-  console.log(req.body, "req.body");
-  todo.save(err => {
-    if (err) {
-      console.log(err, "can't post req.body");
-    } else {
-      res.json(todo);
-    }
-  });
+  if (!req.body.text) {
+    console.log("Error! There is no content in this todo!");
+    let message = { error: "Error! There is no content in this todo!" };
+    res.status(400).json(message);
+  } else {
+    let todo = new Todo(req.body);
+    console.log(req.body, "req.body");
+    todo.save(err => {
+      if (err) {
+        console.log(err, "can't post req.body");
+      } else {
+        res.json(todo);
+      }
+    });
+  }
 });
 
 // router.route('/todos/:id')
@@ -93,4 +99,4 @@ router.put("/:id", (req, res) => {
 
 //   curl -X DELETE "http://localhost:3004/todos/5da487672c60841361004698"
 
-// curl -X POST -H "Content-Type: application/json" -d '{"text": "hello 33333", "completed":false}' "http://127.0.0.1:3004/todos"
+// curl -X POST -H "Content-Type: application/json" -d '{"completed":false,"dueTime":"2019-10-15T11:02:35.000Z"}' "http://127.0.0.1:3004/todos"
