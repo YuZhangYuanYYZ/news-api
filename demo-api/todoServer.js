@@ -38,6 +38,7 @@ router.get(`/`, function(req, res) {
     if (err) {
       console.log(err, "can't get from api");
     } else {
+      console.log(result, "result");
       res.json(result);
     }
   });
@@ -70,7 +71,11 @@ router.delete("/:id", (req, res) => {
 router.put("/:id", (req, res) => {
   Todo.findById({ _id: req.params.id }, (err, result) => {
     let newResult = result;
+    console.log(req.body, "req.body");
+    newResult.dueTime = req.body.dueTime;
     newResult.completed = !result.completed;
+
+    // console.log(newResult, "newResult newResult newResult!");
     let todo = new Todo(newResult);
     todo.save(err => {
       if (err) {
@@ -86,6 +91,6 @@ router.put("/:id", (req, res) => {
 // curl -X PUT -H "Content-Type: application/json" -d '{"completed":true}' "http://127.0.0.1:3004/todos/5d7c862b3ce7a42b36c7baa9"
 //curl http://localhost:3004/todos
 
-//   curl -X DELETE "http://localhost:3004/todos/5d7bc3568873402670c5a960"
+//   curl -X DELETE "http://localhost:3004/todos/5da487672c60841361004698"
 
 // curl -X POST -H "Content-Type: application/json" -d '{"text": "hello 33333", "completed":false}' "http://127.0.0.1:3004/todos"

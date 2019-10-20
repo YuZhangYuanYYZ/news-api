@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon src/index.js"
+    "start": "nodemon demo-api/todoServer.js"
   },
   "keywords": [],
   "author": "",
@@ -28,9 +28,9 @@
     }
   },
   "lint-staged": {
-      "demo-api/**/*.{js,jsx,ts,tsx}": [
-        "prettier --write",
-        "git add"
-      ]
+    "demo-api/**/*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "git add"
+    ]
   }
 }
