@@ -38,8 +38,16 @@ router.get(`/`, function(req, res) {
     if (err) {
       console.log(err, "can't get from api");
     } else {
-      console.log(result, "result");
-      res.json(result);
+      const finalResult = result.map((todo, index) => {
+        let newTodo = new Object();
+        newTodo.id = todo._id;
+        newTodo.completed = todo.completed;
+        newTodo.dueTime = todo.dueTime;
+        newTodo.text = todo.text;
+        return newTodo;
+      });
+      console.log(finalResult, "result");
+      res.json(finalResult);
     }
   });
 });
