@@ -71,22 +71,24 @@ router.delete("/:id", (req, res) => {
 router.put("/:id", (req, res) => {
   Todo.findById({ _id: req.params.id }, (err, result) => {
     let newResult = result;
+
     newResult.dueTime = req.body.dueTime;
-    newResult.completed = !result.completed;
+    newResult.completed = req.body.completed
+      ? req.body.completed
+      : newResult.completed;
 
     let todo = new Todo(newResult);
-    todo.save(err => {
+    todo.save((err, product) => {
       if (err) {
         res.send(err);
       } else {
-        console.log(newResult, "has been updated!");
-        res.json(newResult);
+        res.json(product);
       }
     });
   });
 });
 
-// curl -X PUT -H "Content-Type: application/json" -d '{"dueTime":"2019-10-14T11:02:35.000Z"}' "http://127.0.0.1:3004/todos/5d93323c16ced9e3d11ba10c"
+// curl -X PUT -H "Content-Type: application/json" -d '{"completed":true}' "http://127.0.0.1:3004/todos/5d93323c16ced9e3d11ba10c"
 //curl http://localhost:3004/todos
 
 //   curl -X DELETE "http://localhost:3004/todos/5da487672c60841361004698"
