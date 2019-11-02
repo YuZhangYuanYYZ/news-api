@@ -37,6 +37,7 @@ router.get(`/`, function(req, res) {
   Todo.find((err, result) => {
     if (err) {
       console.log(err, "can't get from api");
+      res.status(400).json({ error: "can't get from api" });
     } else {
       const finalResult = result.map((todo, index) => {
         let newTodo = new Object();
@@ -44,6 +45,7 @@ router.get(`/`, function(req, res) {
         newTodo.completed = todo.completed;
         newTodo.dueTime = todo.dueTime;
         newTodo.text = todo.text;
+        newTodo.favorate = todo.favorate;
         return newTodo;
       });
       console.log(finalResult, "result");
@@ -85,18 +87,19 @@ router.delete("/:id", (req, res) => {
 router.put("/:id", (req, res) => {
   Todo.findById({ _id: req.params.id }, (err, result) => {
     let newResult = result;
-
+    console.log(req.body, "req.body");
     newResult.dueTime = req.body.dueTime;
     newResult.completed = req.body.completed
       ? req.body.completed
       : newResult.completed;
+    newResult.favorate = req.body.favorate;
 
     let todo = new Todo(newResult);
     todo.save((err, product) => {
       if (err) {
         res.send(err);
       } else {
-        res.json(product);
+        res.json(newResult);
       }
     });
   });
